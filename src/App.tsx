@@ -1,30 +1,9 @@
-import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
-import { gql, useQuery } from "@apollo/client";
-
-const GET_REPORTS = gql`
-  query getReports($managerId: Int) {
-    getReports(managerId: $managerId) {
-      id
-      name
-      email
-      manager_id
-    }
-  }
-`;
-
-function Reports() {
-  const { loading, error, data } = useQuery(GET_REPORTS, {
-    variables: { managerId: 1 },
-  });
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <p>`Error! ${error}`</p>;
-
-  return <p>{data.getReports.name}</p>;
-}
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import Users from "./pages/Users";
+import UserReports from "./pages/UserReports";
+import NewReport from "./pages/NewReport";
 
 function App() {
   const client = new ApolloClient({
@@ -34,9 +13,11 @@ function App() {
 
   return (
     <ApolloProvider client={client}>
-      <div className="App">
-        <Reports />
-      </div>
+      <Router>
+        <Route path="/" exact component={Users} />
+        <Route path="/users/:userId" component={UserReports} />
+        <Route path="/users/:userId/new/:matrixId" component={NewReport} />
+      </Router>
     </ApolloProvider>
   );
 }
