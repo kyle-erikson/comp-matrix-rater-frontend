@@ -1,5 +1,5 @@
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   BrowserRouter as Router,
   Route,
@@ -16,6 +16,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  Slider,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { ExpandMore } from "@material-ui/icons";
@@ -64,6 +65,19 @@ const CompetencyComponent = ({
   );
 };
 
+const SAVE_REPORT = gql`
+  mutation saveReport($input: ReportInput) {
+    saveReport(input: $input) {
+      id
+      competency_id
+      user_id
+      rating
+      notes
+      matrix_report_id
+    }
+  }
+`;
+
 const CompetencyDescComponent = ({
   attributeTitle,
   compName,
@@ -71,6 +85,23 @@ const CompetencyDescComponent = ({
   description,
 }: CompetencyDescription) => {
   const classes = useStyles();
+
+  const [saveReport, { data }] = useMutation(SAVE_REPORT);
+
+  //TODO: Slider saving values, but need to correctly keep state for each of these items and track values.
+  const saveReportOnChange = (e: object, value: number | number[]) => {
+    saveReport({
+      variables: {
+        input: {
+          matrix_id: 1,
+          competency_id: 1,
+          user_id: 2,
+          rating: value,
+        },
+      },
+    });
+  };
+
   return (
     <Card className={classes.root}>
       <CardContent>
@@ -87,6 +118,16 @@ const CompetencyDescComponent = ({
         <Typography variant="body2" component="p">
           {description}
         </Typography>
+        <Slider
+          defaultValue={3}
+          aria-labelledby="discrete-slider"
+          valueLabelDisplay="auto"
+          step={1}
+          marks
+          min={1}
+          max={5}
+          onChangeCommitted={saveReportOnChange}
+        />
       </CardContent>
     </Card>
   );

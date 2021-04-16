@@ -2,6 +2,11 @@ type BaseReport = {
   getBaseReportForUser: [KeyArea];
 };
 
+type NewReport = {
+  id: Number;
+  reports: [KeyArea];
+};
+
 type KeyArea = {
   name: string;
   attribute: [Attribute];
@@ -31,4 +36,5 @@ export type {
   Attribute,
   Competency,
   CompetencyDescription,
+  NewReport,
 };
