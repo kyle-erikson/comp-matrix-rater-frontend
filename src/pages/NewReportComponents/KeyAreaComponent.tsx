@@ -29,8 +29,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+type KeyAreaProps = KeyArea & {
+  reportId: string;
+};
+
 ////Advanced version
-const KeyAreaComponent = ({ name, attribute }: KeyArea) => {
+const KeyAreaComponent = ({ name, attribute, reportId }: KeyAreaProps) => {
   const classes = useStyles();
 
   return (
@@ -45,7 +49,7 @@ const KeyAreaComponent = ({ name, attribute }: KeyArea) => {
       <AccordionDetails>
         {attribute &&
           attribute.map((attributeItem: Attribute) => (
-            <AttributeComponent {...attributeItem} />
+            <AttributeComponent {...attributeItem} reportId={reportId} />
           ))}
       </AccordionDetails>
     </Accordion>

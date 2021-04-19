@@ -1,31 +1,12 @@
-import React from "react";
 import { gql, useMutation } from "@apollo/client";
 import {
-  BrowserRouter as Router,
-  Route,
-  Link,
-  useParams,
-  RouteComponentProps,
-} from "react-router-dom";
-import {
-  Accordion,
-  AccordionSummary,
   Typography,
   makeStyles,
-  AccordionDetails,
   Card,
-  CardActions,
   CardContent,
   Slider,
 } from "@material-ui/core";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { ExpandMore } from "@material-ui/icons";
-import {
-  KeyArea,
-  Attribute,
-  Competency,
-  CompetencyDescription,
-} from "./NewReportTypes";
+import { Competency, CompetencyDescription, Rating } from "./NewReportTypes";
 
 const useStyles = makeStyles({
   root: {
@@ -44,11 +25,18 @@ const useStyles = makeStyles({
   },
 });
 
+type CompetencyProps = Competency & {
+  reportId: string;
+};
+
 const CompetencyComponent = ({
+  id,
   attribute,
   name,
   competency_description,
-}: Competency) => {
+  rating,
+  reportId,
+}: CompetencyProps) => {
   return (
     <div>
       {competency_description &&
@@ -56,8 +44,11 @@ const CompetencyComponent = ({
           (competencyDescItem: CompetencyDescription) => (
             <CompetencyDescComponent
               {...competencyDescItem}
+              compId={id}
               compName={name}
               attributeTitle={attribute}
+              ratings={rating}
+              reportId={reportId}
             />
           )
         )}
@@ -78,29 +69,69 @@ const SAVE_REPORT = gql`
   }
 `;
 
-const CompetencyDescComponent = ({
-  attributeTitle,
-  compName,
-  core,
-  description,
-}: CompetencyDescription) => {
-  const classes = useStyles();
+type CompDescComponent = CompetencyDescription & {
+  ratings: [Rating];
+  compId: number;
+  compName: string;
+  reportId: string;
+};
 
+type SliderComponentProps = Rating & {
+  compId: number;
+  reportId: string;
+};
+
+const SliderComponent = ({
+  id,
+  notes,
+  rating,
+  user_id,
+  compId,
+  reportId,
+}: SliderComponentProps) => {
   const [saveReport, { data }] = useMutation(SAVE_REPORT);
 
-  //TODO: Slider saving values, but need to correctly keep state for each of these items and track values.
   const saveReportOnChange = (e: object, value: number | number[]) => {
     saveReport({
       variables: {
         input: {
-          matrix_id: 1,
-          competency_id: 1,
-          user_id: 2,
+          rating_id: rating,
+          notes: notes,
+          competency_id: compId,
+          user_id: user_id,
           rating: value,
+          matrix_report_id: reportId,
         },
       },
     });
   };
+
+  return (
+    <Slider
+      defaultValue={3}
+      aria-labelledby="discrete-slider"
+      valueLabelDisplay="auto"
+      step={1}
+      marks
+      min={1}
+      max={5}
+      onChangeCommitted={saveReportOnChange}
+      value={rating ?? 3}
+    />
+  );
+};
+
+//TODO: Doesn't work if there is no rating already existing
+const CompetencyDescComponent = ({
+  attributeTitle,
+  compId,
+  compName,
+  core,
+  description,
+  ratings,
+  reportId,
+}: CompDescComponent) => {
+  const classes = useStyles();
 
   return (
     <Card className={classes.root}>
@@ -118,16 +149,10 @@ const CompetencyDescComponent = ({
         <Typography variant="body2" component="p">
           {description}
         </Typography>
-        <Slider
-          defaultValue={3}
-          aria-labelledby="discrete-slider"
-          valueLabelDisplay="auto"
-          step={1}
-          marks
-          min={1}
-          max={5}
-          onChangeCommitted={saveReportOnChange}
-        />
+        {ratings &&
+          ratings.map((rating) => {
+            return <SliderComponent {...rating} {...compId} {...reportId} />;
+          })}
       </CardContent>
     </Card>
   );

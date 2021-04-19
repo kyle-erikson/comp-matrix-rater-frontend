@@ -71,13 +71,21 @@ const useStyles = makeStyles({
 //   );
 // };
 
-const AttributeComponent = ({ name, competency }: Attribute) => {
+type AttributeProps = Attribute & {
+  reportId: string;
+};
+
+const AttributeComponent = ({ name, competency, reportId }: AttributeProps) => {
   const classes = useStyles();
   return (
     <div>
       {competency &&
         competency.map((competencyItem: Competency) => (
-          <CompetencyComponent {...competencyItem} attribute={name} />
+          <CompetencyComponent
+            {...competencyItem}
+            attribute={name}
+            reportId={reportId}
+          />
         ))}
     </div>
   );

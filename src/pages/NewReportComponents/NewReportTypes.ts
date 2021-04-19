@@ -1,5 +1,5 @@
-type BaseReport = {
-  getBaseReportForUser: [KeyArea];
+type Report = {
+  getReport: [KeyArea];
 };
 
 type NewReport = {
@@ -18,23 +18,32 @@ type Attribute = {
 };
 
 type Competency = {
+  id: number;
   attribute: string;
   name: string;
   competency_description: [CompetencyDescription];
+  rating: [Rating];
+};
+
+type Rating = {
+  id: number;
+  notes: string;
+  rating: number;
+  user_id: number;
 };
 
 type CompetencyDescription = {
   attributeTitle: string;
-  compName: string;
   core: boolean;
   description: string;
 };
 
 export type {
-  BaseReport,
+  Report,
   KeyArea,
   Attribute,
   Competency,
   CompetencyDescription,
   NewReport,
+  Rating,
 };
