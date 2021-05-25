@@ -29,7 +29,6 @@ type Rating = {
   id: number;
   notes: string;
   rating: number;
-  user_id: number;
 };
 
 type CompetencyDescription = {

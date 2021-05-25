@@ -24,7 +24,6 @@ const GET_REPORT = gql`
           }
           rating {
             id
-            user_id
             rating
             notes
           }

@@ -61,7 +61,6 @@ const SAVE_REPORT = gql`
     saveReport(input: $input) {
       id
       competency_id
-      user_id
       rating
       notes
       matrix_report_id
@@ -76,29 +75,28 @@ type CompDescComponent = CompetencyDescription & {
   reportId: string;
 };
 
-type SliderComponentProps = Rating & {
+type SliderComponentProps = {
+  rating?: Rating;
   compId: number;
   reportId: string;
 };
 
 const SliderComponent = ({
-  id,
-  notes,
   rating,
-  user_id,
   compId,
   reportId,
 }: SliderComponentProps) => {
-  const [saveReport, { data }] = useMutation(SAVE_REPORT);
+  const [saveReport, { data }] = useMutation(SAVE_REPORT, {
+    onCompleted({ rating: value }) {},
+  });
 
   const saveReportOnChange = (e: object, value: number | number[]) => {
     saveReport({
       variables: {
         input: {
-          rating_id: rating,
-          notes: notes,
+          rating_id: rating ? rating.id : 0,
+          notes: rating ? rating.notes : "",
           competency_id: compId,
-          user_id: user_id,
           rating: value,
           matrix_report_id: reportId,
         },
@@ -116,7 +114,7 @@ const SliderComponent = ({
       min={1}
       max={5}
       onChangeCommitted={saveReportOnChange}
-      value={rating ?? 3}
+      value={rating?.rating}
     />
   );
 };
@@ -132,6 +130,9 @@ const CompetencyDescComponent = ({
   reportId,
 }: CompDescComponent) => {
   const classes = useStyles();
+
+  console.log(compId);
+  console.log(reportId);
 
   return (
     <Card className={classes.root}>
@@ -149,10 +150,19 @@ const CompetencyDescComponent = ({
         <Typography variant="body2" component="p">
           {description}
         </Typography>
-        {ratings &&
+        {ratings.length > 0 ? (
           ratings.map((rating) => {
-            return <SliderComponent {...rating} {...compId} {...reportId} />;
-          })}
+            return (
+              <SliderComponent
+                rating={rating}
+                compId={compId}
+                reportId={reportId}
+              />
+            );
+          })
+        ) : (
+          <SliderComponent compId={compId} reportId={reportId} />
+        )}
       </CardContent>
     </Card>
   );
