@@ -5,8 +5,10 @@ import {
   Card,
   CardContent,
   Slider,
+  TextField,
 } from "@material-ui/core";
 import { Competency, CompetencyDescription, Rating } from "./NewReportTypes";
+import { useState } from "react";
 
 const useStyles = makeStyles({
   root: {
@@ -75,20 +77,19 @@ type CompDescComponent = CompetencyDescription & {
   reportId: string;
 };
 
-type SliderComponentProps = {
+type RatingComponentProps = {
   rating?: Rating;
   compId: number;
   reportId: string;
 };
 
-const SliderComponent = ({
+const RatingComponent = ({
   rating,
   compId,
   reportId,
-}: SliderComponentProps) => {
-  const [saveReport, { data }] = useMutation(SAVE_REPORT, {
-    onCompleted({ rating: value }) {},
-  });
+}: RatingComponentProps) => {
+  const [saveReport, { data }] = useMutation(SAVE_REPORT);
+  const [note, setNote] = useState("");
 
   const saveReportOnChange = (e: object, value: number | number[]) => {
     saveReport({
@@ -104,22 +105,53 @@ const SliderComponent = ({
     });
   };
 
+  const marks = [
+    {
+      value: 1,
+      label: "1",
+    },
+    {
+      value: 2,
+      label: "",
+    },
+    {
+      value: 3,
+      label: "",
+    },
+    {
+      value: 4,
+      label: "",
+    },
+    {
+      value: 5,
+      label: "5",
+    },
+  ];
+
   return (
-    <Slider
-      defaultValue={3}
-      aria-labelledby="discrete-slider"
-      valueLabelDisplay="auto"
-      step={1}
-      marks
-      min={1}
-      max={5}
-      onChangeCommitted={saveReportOnChange}
-      value={rating?.rating}
-    />
+    <>
+      <Slider
+        defaultValue={3}
+        aria-labelledby="discrete-slider"
+        valueLabelDisplay="auto"
+        step={1}
+        marks={marks}
+        min={1}
+        max={5}
+        onChangeCommitted={saveReportOnChange}
+        value={rating?.rating}
+      />
+      <TextField
+        label="Notes"
+        variant="outlined"
+        value={rating?.notes}
+        fullWidth
+        onChange={(e) => setNote(e.target.value)}
+      />
+    </>
   );
 };
 
-//TODO: Doesn't work if there is no rating already existing
 const CompetencyDescComponent = ({
   attributeTitle,
   compId,
@@ -130,9 +162,6 @@ const CompetencyDescComponent = ({
   reportId,
 }: CompDescComponent) => {
   const classes = useStyles();
-
-  console.log(compId);
-  console.log(reportId);
 
   return (
     <Card className={classes.root}>
@@ -153,7 +182,7 @@ const CompetencyDescComponent = ({
         {ratings.length > 0 ? (
           ratings.map((rating) => {
             return (
-              <SliderComponent
+              <RatingComponent
                 rating={rating}
                 compId={compId}
                 reportId={reportId}
@@ -161,7 +190,7 @@ const CompetencyDescComponent = ({
             );
           })
         ) : (
-          <SliderComponent compId={compId} reportId={reportId} />
+          <RatingComponent compId={compId} reportId={reportId} />
         )}
       </CardContent>
     </Card>
