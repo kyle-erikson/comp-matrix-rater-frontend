@@ -6,10 +6,17 @@ import {
   CardContent,
   Slider,
   TextField,
+  Divider,
+  Box,
 } from "@material-ui/core";
-import { Competency, CompetencyDescription, Rating } from "./NewReportTypes";
+import {
+  Competency,
+  CompetencyDescription,
+  Rating as RatingType,
+} from "./NewReportTypes";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce/lib";
+import Rating from "@material-ui/lab/Rating";
 
 const useStyles = makeStyles({
   root: {
@@ -72,14 +79,14 @@ const SAVE_REPORT = gql`
 `;
 
 type CompDescComponent = CompetencyDescription & {
-  ratings: [Rating];
+  ratings: [RatingType];
   compId: number;
   compName: string;
   reportId: string;
 };
 
 type RatingComponentProps = {
-  rating?: Rating;
+  rating?: RatingType;
   compId: number;
   reportId: string;
 };
@@ -91,9 +98,10 @@ const RatingComponent = ({
 }: RatingComponentProps) => {
   const [saveReport, { data }] = useMutation(SAVE_REPORT);
   const [note, setNote] = useState(rating?.notes);
-  const [ratingVal, setRatingVal] = useState<number | number[] | undefined>(
-    rating?.rating
+  const [ratingVal, setRatingVal] = useState<number | null>(
+    rating?.rating ? rating?.rating : 0
   );
+  const [hover, setHover] = useState(-1);
   const debouncedNote = useDebouncedCallback((value) => {
     setNote(value);
   }, 500);
@@ -141,9 +149,21 @@ const RatingComponent = ({
     },
   ];
 
+  type labelsType = {
+    [key: number]: string;
+  };
+
+  const labels: labelsType = {
+    1: "Unacceptable",
+    2: "Poor",
+    3: "Ok",
+    4: "Good",
+    5: "Excellent",
+  };
+
   return (
     <>
-      <Slider
+      {/* <Slider
         defaultValue={3}
         aria-labelledby="discrete-slider"
         valueLabelDisplay="auto"
@@ -153,7 +173,19 @@ const RatingComponent = ({
         max={5}
         onChangeCommitted={(e, value) => setRatingVal(value)}
         value={ratingVal}
+      /> */}
+      <Rating
+        name="hover-feedback"
+        value={ratingVal}
+        precision={1}
+        onChange={(e, value) => setRatingVal(value)}
+        onChangeActive={(event, newHover) => {
+          setHover(newHover);
+        }}
       />
+      {ratingVal !== null && (
+        <Box ml={2}>{labels[hover !== -1 ? hover : ratingVal]}</Box>
+      )}
       <TextField
         label="Notes"
         variant="outlined"
@@ -179,32 +211,38 @@ const CompetencyDescComponent = ({
   return (
     <Card className={classes.root}>
       <CardContent>
-        <Typography
-          className={classes.title}
-          color="textSecondary"
-          gutterBottom
-        >
-          {attributeTitle}
-        </Typography>
-        <Typography variant="h5" component="h2">
-          {compName}
-        </Typography>
-        <Typography variant="body2" component="p">
-          {description}
-        </Typography>
-        {ratings.length > 0 ? (
-          ratings.map((rating) => {
-            return (
-              <RatingComponent
-                rating={rating}
-                compId={compId}
-                reportId={reportId}
-              />
-            );
-          })
-        ) : (
-          <RatingComponent compId={compId} reportId={reportId} />
-        )}
+        <div>
+          <Typography
+            className={classes.title}
+            color="textSecondary"
+            gutterBottom
+          >
+            {attributeTitle}
+          </Typography>
+          <Typography variant="h5" component="h2">
+            {compName}
+          </Typography>
+          <Typography variant="body2" component="p">
+            {description}
+          </Typography>
+        </div>
+
+        <Divider variant="middle" />
+        <div>
+          {ratings.length > 0 ? (
+            ratings.map((rating) => {
+              return (
+                <RatingComponent
+                  rating={rating}
+                  compId={compId}
+                  reportId={reportId}
+                />
+              );
+            })
+          ) : (
+            <RatingComponent compId={compId} reportId={reportId} />
+          )}
+        </div>
       </CardContent>
     </Card>
   );
