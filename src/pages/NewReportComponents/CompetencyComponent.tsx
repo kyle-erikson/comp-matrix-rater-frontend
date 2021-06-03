@@ -14,6 +14,7 @@ import {
 import {
   Competency,
   CompetencyDescription,
+  NewRating,
   Rating as RatingType,
 } from "./NewReportTypes";
 import { useEffect, useState } from "react";
@@ -88,50 +89,52 @@ const SAVE_REPORT = gql`
 `;
 
 type CompDescComponent = CompetencyDescription & {
-  ratings: [RatingType];
+  ratings: [NewRating];
   compId: number;
   compName: string;
   reportId: string;
 };
 
 type RatingComponentProps = {
-  rating?: RatingType;
-  compId: number;
-  reportId: string;
+  rating: NewRating;
 };
 
-const RatingComponent = ({
-  rating,
-  compId,
-  reportId,
-}: RatingComponentProps) => {
-  const [saveReport, { data }] = useMutation(SAVE_REPORT);
-  const [note, setNote] = useState(rating?.notes);
-  const [ratingVal, setRatingVal] = useState<number | null>(
-    rating?.rating ? rating?.rating : 0
-  );
+const RatingComponent = ({ rating: initialRating }: RatingComponentProps) => {
+  const [saveReport, { data }] = useMutation<NewRating>(SAVE_REPORT, {
+    onCompleted: (data: NewRating) => {
+      console.log(rating);
+      console.log(data);
+      // setRating({ ...data });
+    },
+  });
+  // const [note, setNote] = useState(rating?.notes);
+  // const [ratingVal, setRatingVal] = useState<number | null>(
+  //   rating?.rating ? rating?.rating : 0
+  // );
+  const [rating, setRating] = useState(initialRating);
   const [hover, setHover] = useState(-1);
   const debouncedNote = useDebouncedCallback((value) => {
-    setNote(value);
+    // setNote(value);
+    setRating({ ...rating, notes: value });
   }, 500);
 
   const saveRating = () => {
     saveReport({
       variables: {
         input: {
-          rating_id: rating ? rating.id : 0,
-          notes: note,
-          competency_id: compId,
-          rating: ratingVal,
-          matrix_report_id: reportId,
+          rating_id: rating.id,
+          notes: rating.notes,
+          competency_id: rating.competency_id,
+          rating: rating.rating,
+          matrix_report_id: rating.matrix_report_id,
         },
       },
     });
   };
 
   useEffect(() => {
-    if (note || ratingVal) saveRating();
-  }, [note, ratingVal]);
+    if (rating.notes || rating.rating) saveRating();
+  }, [rating.notes, rating.rating]);
 
   const marks = [
     {
@@ -173,22 +176,30 @@ const RatingComponent = ({
       <Box display="flex" width={1} m={0.5}>
         <Rating
           name="hover-feedback"
-          value={ratingVal}
+          value={rating.rating}
           precision={1}
-          onChange={(e, value) => setRatingVal(value)}
+          onChange={(e, value) => {
+            if (value) {
+              console.log("value changed");
+              return setRating({ ...rating, rating: value });
+            } else {
+              console.log("value not changed");
+              return null;
+            }
+          }}
           onChangeActive={(event, newHover) => {
             setHover(newHover);
           }}
         />
-        {ratingVal !== null && (
-          <Box ml={2}>{labels[hover !== -1 ? hover : ratingVal]}</Box>
+        {rating.rating !== null && (
+          <Box ml={2}>{labels[hover !== -1 ? hover : rating.rating]}</Box>
         )}
       </Box>
 
       <TextField
         label="Notes"
         variant="outlined"
-        value={note}
+        value={rating.notes}
         fullWidth
         onChange={(e) => debouncedNote(e.target.value)}
         multiline
@@ -208,6 +219,14 @@ const CompetencyDescComponent = ({
   reportId,
 }: CompDescComponent) => {
   const classes = useStyles();
+
+  let emptyRating: NewRating = {
+    competency_id: compId,
+    matrix_report_id: reportId,
+    notes: "",
+    rating: 0,
+    id: 0,
+  };
 
   return (
     <Box marginTop={2}>
@@ -240,16 +259,10 @@ const CompetencyDescComponent = ({
             <Grid item xs={4}>
               {ratings.length > 0 ? (
                 ratings.map((rating) => {
-                  return (
-                    <RatingComponent
-                      rating={rating}
-                      compId={compId}
-                      reportId={reportId}
-                    />
-                  );
+                  return <RatingComponent rating={rating} />;
                 })
               ) : (
-                <RatingComponent compId={compId} reportId={reportId} />
+                <RatingComponent rating={emptyRating} />
               )}
             </Grid>
           </Grid>

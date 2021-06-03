@@ -22,13 +22,21 @@ type Competency = {
   attribute: string;
   name: string;
   competency_description: [CompetencyDescription];
-  rating: [Rating];
+  rating: [NewRating];
 };
 
 type Rating = {
   id: number;
   notes: string;
   rating: number;
+};
+
+type NewRating = {
+  id: number;
+  competency_id: number;
+  rating: number;
+  notes?: String;
+  matrix_report_id: String;
 };
 
 type CompetencyDescription = {
@@ -45,4 +53,5 @@ export type {
   CompetencyDescription,
   NewReport,
   Rating,
+  NewRating,
 };

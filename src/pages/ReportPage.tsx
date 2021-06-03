@@ -9,6 +9,7 @@ import {
   StepContent,
   Button,
   Typography,
+  Box,
 } from "@material-ui/core";
 import { useState } from "react";
 
@@ -74,8 +75,8 @@ const ReportPage = ({ match }: ReportPageProps) => {
             <StepLabel>{keyArea.name}</StepLabel>
             <StepContent>
               <KeyAreaComponent {...keyArea} reportId={match.params.reportId} />
-              <div>
-                <div>
+              <Box>
+                <Box mt={2}>
                   <Button disabled={activeStep === 0} onClick={handleBack}>
                     Back
                   </Button>
@@ -88,8 +89,8 @@ const ReportPage = ({ match }: ReportPageProps) => {
                       ? "Finish"
                       : "Next"}
                   </Button>
-                </div>
-              </div>
+                </Box>
+              </Box>
             </StepContent>
           </Step>
         ))}
