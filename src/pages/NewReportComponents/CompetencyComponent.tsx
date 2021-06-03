@@ -8,6 +8,7 @@ import {
   TextField,
   Divider,
   Box,
+  Grid,
 } from "@material-ui/core";
 import {
   Competency,
@@ -48,7 +49,7 @@ const CompetencyComponent = ({
   reportId,
 }: CompetencyProps) => {
   return (
-    <div>
+    <Grid item xs>
       {competency_description &&
         competency_description.map(
           (competencyDescItem: CompetencyDescription) => (
@@ -62,7 +63,7 @@ const CompetencyComponent = ({
             />
           )
         )}
-    </div>
+    </Grid>
   );
 };
 

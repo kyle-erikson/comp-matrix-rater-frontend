@@ -16,6 +16,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  Grid,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { ExpandMore } from "@material-ui/icons";
@@ -24,7 +25,7 @@ import CompetencyComponent from "./CompetencyComponent";
 
 const useStyles = makeStyles({
   root: {
-    minWidth: 275,
+    flexGrow: 1,
   },
   bullet: {
     display: "inline-block",
@@ -38,38 +39,6 @@ const useStyles = makeStyles({
     marginBottom: 12,
   },
 });
-
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//     width: "100%",
-//   },
-//   heading: {
-//     fontSize: theme.typography.pxToRem(15),
-//     fontWeight: theme.typography.fontWeightRegular,
-//   },
-// }));
-
-// const AttributeComponent = ({ name, competency }: Attribute) => {
-//   const classes = useStyles();
-
-//   return (
-//     <Accordion>
-//       <AccordionSummary
-//         expandIcon={<ExpandMoreIcon />}
-//         aria-controls="panel1a-content"
-//         id="panel1a-header"
-//       >
-//         <Typography className={classes.heading}>{name}</Typography>
-//       </AccordionSummary>
-//       <AccordionDetails>
-//         {competency &&
-//           competency.map((competencyItem: Competency) => (
-//             <CompetencyComponent {...competencyItem} />
-//           ))}
-//       </AccordionDetails>
-//     </Accordion>
-//   );
-// };
 
 type AttributeProps = Attribute & {
   reportId: string;

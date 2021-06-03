@@ -13,6 +13,7 @@ import {
   Typography,
   makeStyles,
   AccordionDetails,
+  Grid,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { ExpandMore } from "@material-ui/icons";
@@ -47,10 +48,12 @@ const KeyAreaComponent = ({ name, attribute, reportId }: KeyAreaProps) => {
         <Typography className={classes.heading}>{name}</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        {attribute &&
-          attribute.map((attributeItem: Attribute) => (
-            <AttributeComponent {...attributeItem} reportId={reportId} />
-          ))}
+        <Grid container spacing={3}>
+          {attribute &&
+            attribute.map((attributeItem: Attribute) => (
+              <AttributeComponent {...attributeItem} reportId={reportId} />
+            ))}
+        </Grid>
       </AccordionDetails>
     </Accordion>
   );
