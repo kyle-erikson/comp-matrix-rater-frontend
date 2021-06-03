@@ -47,7 +47,7 @@ type AttributeProps = Attribute & {
 const AttributeComponent = ({ name, competency, reportId }: AttributeProps) => {
   const classes = useStyles();
   return (
-    <div>
+    <>
       {competency &&
         competency.map((competencyItem: Competency) => (
           <CompetencyComponent
@@ -56,7 +56,7 @@ const AttributeComponent = ({ name, competency, reportId }: AttributeProps) => {
             reportId={reportId}
           />
         ))}
-    </div>
+    </>
   );
 };
 

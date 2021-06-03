@@ -9,6 +9,7 @@ import {
   Divider,
   Box,
   Grid,
+  Button,
 } from "@material-ui/core";
 import {
   Competency,
@@ -18,6 +19,7 @@ import {
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce/lib";
 import Rating from "@material-ui/lab/Rating";
+import classes from "*.module.css";
 
 const useStyles = makeStyles({
   root: {
@@ -34,6 +36,12 @@ const useStyles = makeStyles({
   pos: {
     marginBottom: 12,
   },
+  card: {
+    height: 200,
+  },
+  // notes: {
+  //   height: "100%",
+  // },
 });
 
 type CompetencyProps = Competency & {
@@ -49,7 +57,7 @@ const CompetencyComponent = ({
   reportId,
 }: CompetencyProps) => {
   return (
-    <Grid item xs>
+    <>
       {competency_description &&
         competency_description.map(
           (competencyDescItem: CompetencyDescription) => (
@@ -63,7 +71,7 @@ const CompetencyComponent = ({
             />
           )
         )}
-    </Grid>
+    </>
   );
 };
 
@@ -122,8 +130,6 @@ const RatingComponent = ({
   };
 
   useEffect(() => {
-    console.log(note);
-    console.log(ratingVal);
     if (note || ratingVal) saveRating();
   }, [note, ratingVal]);
 
@@ -164,35 +170,29 @@ const RatingComponent = ({
 
   return (
     <>
-      {/* <Slider
-        defaultValue={3}
-        aria-labelledby="discrete-slider"
-        valueLabelDisplay="auto"
-        step={1}
-        marks={marks}
-        min={1}
-        max={5}
-        onChangeCommitted={(e, value) => setRatingVal(value)}
-        value={ratingVal}
-      /> */}
-      <Rating
-        name="hover-feedback"
-        value={ratingVal}
-        precision={1}
-        onChange={(e, value) => setRatingVal(value)}
-        onChangeActive={(event, newHover) => {
-          setHover(newHover);
-        }}
-      />
-      {ratingVal !== null && (
-        <Box ml={2}>{labels[hover !== -1 ? hover : ratingVal]}</Box>
-      )}
+      <Box display="flex" width={1} m={0.5}>
+        <Rating
+          name="hover-feedback"
+          value={ratingVal}
+          precision={1}
+          onChange={(e, value) => setRatingVal(value)}
+          onChangeActive={(event, newHover) => {
+            setHover(newHover);
+          }}
+        />
+        {ratingVal !== null && (
+          <Box ml={2}>{labels[hover !== -1 ? hover : ratingVal]}</Box>
+        )}
+      </Box>
+
       <TextField
         label="Notes"
         variant="outlined"
         value={note}
         fullWidth
         onChange={(e) => debouncedNote(e.target.value)}
+        multiline
+        rows={5}
       />
     </>
   );
@@ -210,42 +210,52 @@ const CompetencyDescComponent = ({
   const classes = useStyles();
 
   return (
-    <Card className={classes.root}>
-      <CardContent>
-        <div>
-          <Typography
-            className={classes.title}
-            color="textSecondary"
-            gutterBottom
+    <Box marginTop={2}>
+      <Card className={classes.card}>
+        <CardContent>
+          <Grid
+            container
+            direction="row"
+            justify="space-between"
+            alignItems="flex-start"
           >
-            {attributeTitle}
-          </Typography>
-          <Typography variant="h5" component="h2">
-            {compName}
-          </Typography>
-          <Typography variant="body2" component="p">
-            {description}
-          </Typography>
-        </div>
+            <Grid item xs={7}>
+              <Typography
+                className={classes.title}
+                color="textSecondary"
+                gutterBottom
+              >
+                {attributeTitle}
+              </Typography>
+              <Typography variant="h5" component="h2">
+                {compName}
+              </Typography>
+              <Typography variant="body2" component="p">
+                {description}
+              </Typography>
+            </Grid>
 
-        <Divider variant="middle" />
-        <div>
-          {ratings.length > 0 ? (
-            ratings.map((rating) => {
-              return (
-                <RatingComponent
-                  rating={rating}
-                  compId={compId}
-                  reportId={reportId}
-                />
-              );
-            })
-          ) : (
-            <RatingComponent compId={compId} reportId={reportId} />
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            <Divider orientation="vertical" flexItem />
+
+            <Grid item xs={4}>
+              {ratings.length > 0 ? (
+                ratings.map((rating) => {
+                  return (
+                    <RatingComponent
+                      rating={rating}
+                      compId={compId}
+                      reportId={reportId}
+                    />
+                  );
+                })
+              ) : (
+                <RatingComponent compId={compId} reportId={reportId} />
+              )}
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

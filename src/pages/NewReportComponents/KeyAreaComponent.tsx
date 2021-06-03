@@ -39,38 +39,21 @@ const KeyAreaComponent = ({ name, attribute, reportId }: KeyAreaProps) => {
   const classes = useStyles();
 
   return (
-    <Accordion>
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        aria-controls="panel1a-content"
-        id="panel1a-header"
-      >
-        <Typography className={classes.heading}>{name}</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Grid container spacing={3}>
-          {attribute &&
-            attribute.map((attributeItem: Attribute) => (
-              <AttributeComponent {...attributeItem} reportId={reportId} />
-            ))}
-        </Grid>
-      </AccordionDetails>
-    </Accordion>
+    <Grid
+      container
+      spacing={3}
+      direction="row"
+      justify="space-between"
+      alignItems="flex-start"
+    >
+      {attribute &&
+        attribute.map((attributeItem: Attribute) => (
+          <Grid item sm={6}>
+            <AttributeComponent {...attributeItem} reportId={reportId} />
+          </Grid>
+        ))}
+    </Grid>
   );
 };
-
-// const KeyAreaComponent = ({ name, attribute }: KeyArea) => {
-//   return (
-//     <div>
-//       <Typography variant="h3" component="h3">
-//         {name}
-//       </Typography>
-//       {attribute &&
-//         attribute.map((attributeItem: Attribute) => (
-//           <AttributeComponent {...attributeItem} />
-//         ))}
-//     </div>
-//   );
-// };
 
 export default KeyAreaComponent;
