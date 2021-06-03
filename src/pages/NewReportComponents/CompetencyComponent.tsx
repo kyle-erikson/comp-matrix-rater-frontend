@@ -8,7 +8,8 @@ import {
   TextField,
 } from "@material-ui/core";
 import { Competency, CompetencyDescription, Rating } from "./NewReportTypes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce/lib";
 
 const useStyles = makeStyles({
   root: {
@@ -89,21 +90,33 @@ const RatingComponent = ({
   reportId,
 }: RatingComponentProps) => {
   const [saveReport, { data }] = useMutation(SAVE_REPORT);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(rating?.notes);
+  const [ratingVal, setRatingVal] = useState<number | number[] | undefined>(
+    rating?.rating
+  );
+  const debouncedNote = useDebouncedCallback((value) => {
+    setNote(value);
+  }, 500);
 
-  const saveReportOnChange = (e: object, value: number | number[]) => {
+  const saveRating = () => {
     saveReport({
       variables: {
         input: {
           rating_id: rating ? rating.id : 0,
-          notes: rating ? rating.notes : "",
+          notes: note,
           competency_id: compId,
-          rating: value,
+          rating: ratingVal,
           matrix_report_id: reportId,
         },
       },
     });
   };
+
+  useEffect(() => {
+    console.log(note);
+    console.log(ratingVal);
+    if (note || ratingVal) saveRating();
+  }, [note, ratingVal]);
 
   const marks = [
     {
@@ -138,15 +151,15 @@ const RatingComponent = ({
         marks={marks}
         min={1}
         max={5}
-        onChangeCommitted={saveReportOnChange}
-        value={rating?.rating}
+        onChangeCommitted={(e, value) => setRatingVal(value)}
+        value={ratingVal}
       />
       <TextField
         label="Notes"
         variant="outlined"
-        value={rating?.notes}
+        value={note}
         fullWidth
-        onChange={(e) => setNote(e.target.value)}
+        onChange={(e) => debouncedNote(e.target.value)}
       />
     </>
   );
