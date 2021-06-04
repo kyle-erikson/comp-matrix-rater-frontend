@@ -99,22 +99,26 @@ type RatingComponentProps = {
   rating: NewRating;
 };
 
+type SaveReportResults = {
+  saveReport: NewRating;
+};
+
 const RatingComponent = ({ rating: initialRating }: RatingComponentProps) => {
-  const [saveReport, { data }] = useMutation<NewRating>(SAVE_REPORT, {
-    onCompleted: (data: NewRating) => {
-      console.log(rating);
+  const [saveReport, { data }] = useMutation<SaveReportResults>(SAVE_REPORT, {
+    onCompleted: (data) => {
+      const { id } = data.saveReport;
       console.log(data);
-      // setRating({ ...data });
+      console.log(id);
+      setRating({ ...rating, id: id });
     },
   });
-  // const [note, setNote] = useState(rating?.notes);
+  const [note, setNote] = useState(initialRating.notes);
   // const [ratingVal, setRatingVal] = useState<number | null>(
   //   rating?.rating ? rating?.rating : 0
   // );
   const [rating, setRating] = useState(initialRating);
   const [hover, setHover] = useState(-1);
   const debouncedNote = useDebouncedCallback((value) => {
-    // setNote(value);
     setRating({ ...rating, notes: value });
   }, 500);
 
@@ -180,10 +184,8 @@ const RatingComponent = ({ rating: initialRating }: RatingComponentProps) => {
           precision={1}
           onChange={(e, value) => {
             if (value) {
-              console.log("value changed");
               return setRating({ ...rating, rating: value });
             } else {
-              console.log("value not changed");
               return null;
             }
           }}
@@ -198,10 +200,14 @@ const RatingComponent = ({ rating: initialRating }: RatingComponentProps) => {
 
       <TextField
         label="Notes"
+        name="notes"
         variant="outlined"
-        value={rating.notes}
+        value={note}
         fullWidth
-        onChange={(e) => debouncedNote(e.target.value)}
+        onChange={(e) => {
+          setNote(e.target.value);
+          debouncedNote(e.target.value);
+        }}
         multiline
         rows={5}
       />
