@@ -4,23 +4,15 @@ import {
   makeStyles,
   Card,
   CardContent,
-  Slider,
   TextField,
   Divider,
   Box,
   Grid,
-  Button,
 } from "@material-ui/core";
-import {
-  Competency,
-  CompetencyDescription,
-  NewRating,
-  Rating as RatingType,
-} from "./NewReportTypes";
+import { Competency, CompetencyDescription, NewRating } from "./NewReportTypes";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce/lib";
 import Rating from "@material-ui/lab/Rating";
-import classes from "*.module.css";
 
 const useStyles = makeStyles({
   root: {
@@ -40,9 +32,6 @@ const useStyles = makeStyles({
   card: {
     height: 200,
   },
-  // notes: {
-  //   height: "100%",
-  // },
 });
 
 type CompetencyProps = Competency & {
@@ -107,15 +96,10 @@ const RatingComponent = ({ rating: initialRating }: RatingComponentProps) => {
   const [saveReport, { data }] = useMutation<SaveReportResults>(SAVE_REPORT, {
     onCompleted: (data) => {
       const { id } = data.saveReport;
-      console.log(data);
-      console.log(id);
       setRating({ ...rating, id: id });
     },
   });
   const [note, setNote] = useState(initialRating.notes);
-  // const [ratingVal, setRatingVal] = useState<number | null>(
-  //   rating?.rating ? rating?.rating : 0
-  // );
   const [rating, setRating] = useState(initialRating);
   const [hover, setHover] = useState(-1);
   const debouncedNote = useDebouncedCallback((value) => {
@@ -140,29 +124,6 @@ const RatingComponent = ({ rating: initialRating }: RatingComponentProps) => {
     if (rating.notes || rating.rating) saveRating();
   }, [rating.notes, rating.rating]);
 
-  const marks = [
-    {
-      value: 1,
-      label: "1",
-    },
-    {
-      value: 2,
-      label: "",
-    },
-    {
-      value: 3,
-      label: "",
-    },
-    {
-      value: 4,
-      label: "",
-    },
-    {
-      value: 5,
-      label: "5",
-    },
-  ];
-
   type labelsType = {
     [key: number]: string;
   };
@@ -179,11 +140,12 @@ const RatingComponent = ({ rating: initialRating }: RatingComponentProps) => {
     <>
       <Box display="flex" width={1} m={0.5}>
         <Rating
-          name="hover-feedback"
+          name={"rating-" + rating.competency_id}
           value={rating.rating}
           precision={1}
           onChange={(e, value) => {
             if (value) {
+              console.log(rating);
               return setRating({ ...rating, rating: value });
             } else {
               return null;
